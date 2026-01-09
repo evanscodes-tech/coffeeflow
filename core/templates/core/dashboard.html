@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoffeeFlow Dashboard</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f5f7fa; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        header { background: linear-gradient(135deg, #4a2c1d 0%, #8b4513 100%); color: white; padding: 25px; border-radius: 10px; margin-bottom: 25px; }
+        h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .subtitle { opacity: 0.9; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .stat-card h3 { color: #666; font-size: 1em; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-number { font-size: 2.5em; font-weight: bold; color: #8b4513; }
+        .stat-unit { color: #888; font-size: 0.9em; }
+        
+        .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        @media (max-width: 768px) { .two-column { grid-template-columns: 1fr; } }
+        
+        .section { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .section h2 { color: #444; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px 15px; background: #f8f9fa; border-bottom: 2px solid #dee2e6; color: #555; }
+        td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f8f9fa; }
+        
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        
+        .nav { display: flex; gap: 15px; margin-top: 20px; }
+        .nav a { color: white; text-decoration: none; padding: 8px 16px; border-radius: 5px; background: rgba(255,255,255,0.2); }
+        .nav a:hover { background: rgba(255,255,255,0.3); }
+        
+        .footer { margin-top: 40px; text-align: center; color: #888; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>☕ CoffeeFlow Dashboard</h1>
+            <p class="subtitle">Digital Coffee Collection System • {{ today|date:"F j, Y" }}</p>
+            <div class="nav">
+                <a href="/admin/" target="_blank">Admin Panel</a>
+                <a href="/api/reports/daily/" target="_blank">Daily API</a>
+                <a href="/api/reports/period/" target="_blank">Period Report</a>
+            </div>
+        </header>
+        
+        <!-- Summary Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Today's Deliveries</h3>
+                <div class="stat-number">{{ today_summary.deliveries }}</div>
+                <div class="stat-unit">Collections</div>
+            </div>
+            <div class="stat-card">
+                <h3>Today's Cherry Weight</h3>
+                <div class="stat-number">{{ today_summary.cherry_kg|floatformat:2 }}</div>
+                <div class="stat-unit">Kilograms (cherry)</div>
+            </div>
+            <div class="stat-card">
+                <h3>Today's Dry Weight</h3>
+                <div class="stat-number">{{ today_summary.kg_dry|floatformat:2 }}</div>
+                <div class="stat-unit">Kilograms (dry)</div>
+            </div>
+            <div class="stat-card">
+                <h3>Today's Value</h3>
+                <div class="stat-number">KES {{ today_summary.amount|floatformat:2 }}</div>
+                <div class="stat-unit">Kenya Shillings</div>
+            </div>
+            <div class="stat-card">
+                <h3>SMS Success Rate</h3>
+                <div class="stat-number">
+                    {% if sms_stats.total > 0 %}
+                        {{ sms_stats.sent|floatformat:0 }}/{{ sms_stats.total }}
+                    {% else %}
+                        0/0
+                    {% endif %}
+                </div>
+                <div class="stat-unit">
+                    {% if sms_stats.total > 0 %}
+                        {% widthratio sms_stats.sent sms_stats.total 100 as percentage %}
+                        {{ percentage|floatformat:2 }}% success
+                    {% else %}
+                        No data
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="two-column">
+            <!-- Recent Deliveries -->
+            <div class="section">
+                <h2>Recent Deliveries</h2>
+                {% if recent_deliveries %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Farmer</th>
+                            <th>Cherry (kg)</th>
+                            <th>Dry (kg)</th>
+                            <th>Amount</th>
+                            <th>SMS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for delivery in recent_deliveries %}
+                        <tr>
+                            <td>{{ delivery.delivery_time|date:"H:i" }}</td>
+                            <td>{{ delivery.farmer.name|truncatechars:15 }}</td>
+                            <td>{{ delivery.cherry_kg|floatformat:2 }}</td>
+                            <td>{{ delivery.kg_dry|floatformat:2 }}</td>
+                            <td>KES {{ delivery.total_amount|floatformat:2 }}</td>
+                            <td>
+                                {% if delivery.sms_sent %}
+                                    <span class="badge badge-success">✓ Sent</span>
+                                {% else %}
+                                    <span class="badge badge-pending">Pending</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p style="color: #888; text-align: center; padding: 20px;">No deliveries yet.</p>
+                {% endif %}
+            </div>
+            
+            <!-- Top Farmers Today -->
+            <div class="section">
+                <h2>Top Farmers Today</h2>
+                {% if top_farmers_today %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Farmer</th>
+                            <th>Cherry (kg)</th>
+                            <th>Deliveries</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for farmer in top_farmers_today %}
+                        <tr>
+                            <td>{{ farmer.name|truncatechars:20 }}</td>
+                            <td><strong>{{ farmer.today_cherry_kg|floatformat:2 }}kg</strong></td>
+                            <td>{{ farmer.deliveries.count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p style="color: #888; text-align: center; padding: 20px;">No deliveries today yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- System Stats -->
+        <div class="section">
+            <h2>System Overview</h2>
+            <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+                <div>
+                    <h3 style="color: #666; margin-bottom: 10px;">Total Farmers</h3>
+                    <div style="font-size: 2em; font-weight: bold; color: #8b4513;">{{ total_farmers }}</div>
+                </div>
+                <div>
+                    <h3 style="color: #666; margin-bottom: 10px;">Total Deliveries</h3>
+                    <div style="font-size: 2em; font-weight: bold; color: #8b4513;">{{ total_deliveries }}</div>
+                </div>
+                <div>
+                    <h3 style="color: #666; margin-bottom: 10px;">SMS Notifications</h3>
+                    <div style="font-size: 2em; font-weight: bold; color: #8b4513;">
+                        {{ sms_stats.sent }} sent / {{ sms_stats.total }} total
+                    </div>
+                    {% if sms_stats.failed > 0 %}
+                    <div style="color: #dc3545; font-size: 0.9em; margin-top: 5px;">
+                        {{ sms_stats.failed }} failed
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>CoffeeFlow Digital Collection System • Built with Django • Data updates in real-time</p>
+            <p style="margin-top: 5px; font-size: 0.85em;">
+                <a href="/api/" style="color: #8b4513;">API Documentation</a> • 
+                <a href="/admin/" style="color: #8b4513;">Admin Panel</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
