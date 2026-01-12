@@ -10,6 +10,12 @@ from datetime import datetime, timedelta
 from .models import Farmer, Delivery, Payment
 from .serializers import FarmerSerializer, DeliverySerializer, PaymentSerializer
 
+
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import Group
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+
 # ViewSets
 class FarmerViewSet(viewsets.ModelViewSet):
     queryset = Farmer.objects.all()
@@ -214,3 +220,42 @@ def dashboard(request):
         'total_deliveries': Delivery.objects.count(),
     }
     return render(request, 'core/dashboard.html', context)
+
+
+
+
+
+# In core/views.py
+
+
+def register_collector(request):
+    """Register new coffee collector account"""
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Add to Collectors group
+            collectors_group, created = Group.objects.get_or_create(name='Collectors')
+            user.groups.add(collectors_group)
+            login(request, user)
+            return redirect('dashboard')
+    else:
+        form = UserCreationForm()
+    
+    return render(request, 'registration/register_collector.html', {'form': form})
+
+def register_farmer(request):
+    """Register coffee farmer (with additional info later)"""
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Add to Farmers group
+            farmers_group, created = Group.objects.get_or_create(name='Farmers')
+            user.groups.add(farmers_group)
+            login(request, user)
+            return redirect('dashboard')
+    else:
+        form = UserCreationForm()
+    
+    return render(request, 'registration/register_farmer.html', {'form': form})
