@@ -1,9 +1,11 @@
 import os 
 import os
 import os
-from decouple import config
 
-from decouple import config
+#from decouple import config#
+#from decouple import config#
+
+
 
 """
 Django settings for milkflow project.
@@ -200,9 +202,24 @@ DATABASES = {
 
 # SIMPLE SECURITY FOR NOW
 DEBUG = True  # Change to False later
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-temporary-key')
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-temporary-key')
 ALLOWED_HOSTS = ['*']  # Allow all for testing
 
 # Static files
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = 'static/'
+
+
+# CSRF and CORS settings for Railway
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-ab4b.up.railway.app',
+    'https://*.up.railway.app',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'https://web-production-ab4b.up.railway.app',
+]
+
+# Or allow all for testing (less secure but works)
+# CSRF_TRUSTED_ORIGINS = ['https://*.up.railway.app']
+# CORS_ALLOWED_ORIGINS = ['https://*.up.railway.app']
