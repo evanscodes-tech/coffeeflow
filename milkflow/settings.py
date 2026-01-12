@@ -162,3 +162,26 @@ ALLOWED_HOSTS = ['.railway.app', 'localhost', '127.0.0.1']
 # Use WhiteNoise for static files
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+
+# Override with DATABASE_URL if available and working
+if 'DATABASE_URL' in os.environ:
+    try:
+        import dj_database_url
+        db_from_env = dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            ssl_require=True
+        )
+        DATABASES['default'] = db_from_env
+        print("Using PostgreSQL database")
+    except ImportError:
+        print("PostgreSQL dependencies missing, using SQLite")
+    except Exception as e:
+        print(f"PostgreSQL connection failed: {e}, using SQLite")
