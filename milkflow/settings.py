@@ -185,3 +185,24 @@ if 'DATABASE_URL' in os.environ:
         print("PostgreSQL dependencies missing, using SQLite")
     except Exception as e:
         print(f"PostgreSQL connection failed: {e}, using SQLite")
+        
+        
+        
+        import os
+
+# SIMPLE DATABASE CONFIGURATION - SQLite only
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+
+# SIMPLE SECURITY FOR NOW
+DEBUG = True  # Change to False later
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-temporary-key')
+ALLOWED_HOSTS = ['*']  # Allow all for testing
+
+# Static files
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = 'static/'
