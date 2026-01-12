@@ -4,3 +4,9 @@
 "venv/" 
 ".env" 
 "backups/" 
+.env 
+__pycache__/ 
+*.pyc 
+*.sqlite3 
+staticfiles/ 
+*.log 

@@ -1,4 +1,3 @@
-import os 
 import os
 from decouple import config
 
@@ -132,11 +131,3 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
- 
-# Authentication settings 
-LOGIN_URL = '/accounts/login/' 
-LOGIN_REDIRECT_URL = '/dashboard/' 
-LOGOUT_REDIRECT_URL = '/' 
- 
-# Logout settings 
-LOGOUT_REDIRECT_URL = '/' 

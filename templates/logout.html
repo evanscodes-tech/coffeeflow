@@ -1,0 +1,21 @@
+from django.views.generic import TemplateView
+<!DOCTYPE html> 
+<html> 
+<head> 
+    <title>Logout</title> 
+</head> 
+<body> 
+    <h1>Logout</h1> 
+    <p>Are you sure you want to logout?</p> 
+    <form method=\"post\" action=\"/accounts/logout/\"> 
+        {% csrf_token %} 
+        <button type=\"submit\">Logout</button> 
+    </form> 
+    <p><a href=\"/dashboard/\">Cancel and return to dashboard</a></p> 
+</body> 
+</html> 
+
+urlpatterns = [
+    # ... other URLs
+    path('logout/', TemplateView.as_view(template_name='logout.html'), name='logout_page'),
+]
