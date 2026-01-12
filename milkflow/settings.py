@@ -1,5 +1,6 @@
 import os 
 import os
+import os
 from decouple import config
 
 from decouple import config
@@ -140,3 +141,24 @@ LOGOUT_REDIRECT_URL = '/'
  
 # Logout settings 
 LOGOUT_REDIRECT_URL = '/' 
+
+if 'DATABASE_URL' in os.environ:
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
+
+# Static files for Railway
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+
+# Allow Railway domain
+ALLOWED_HOSTS = ['.railway.app', 'localhost', '127.0.0.1']
+
+# Use WhiteNoise for static files
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

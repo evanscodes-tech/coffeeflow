@@ -90,8 +90,6 @@ python-dateutil==2.9.0.post0
 python-decouple==3.8
 python-json-logger==3.3.0
 pytz==2025.2
-pywin32==310
-pywinpty==2.0.15
 PyYAML==6.0.2
 pyzmq==26.3.0
 referencing==0.36.2
@@ -123,6 +121,8 @@ webencodings==0.5.1
 websocket-client==1.8.0
 whitenoise==6.11.0
 widgetsnbextension==4.0.13
+dj-database-url==2.3.0 
 gunicorn==21.2.0 
 psycopg2-binary==2.9.9 
 whitenoise==6.6.0 
+dj-database-url==2.3.0\ngunicorn==21.2.0\npsycopg2-binary==2.9.9\nwhitenoise==6.6.0\n
