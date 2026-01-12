@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CoffeeFlow Collection System{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1 style="margin-top: 0; color: var(--coffee-dark);">
+        ☕ Coffee Collection Dashboard
+    </h1>
+    <p style="color: var(--coffee-medium);">
+        Track your coffee collections, farmers, and payments
+    </p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="coffee-icon">📦</div>
+        <h3 style="margin: 0; color: var(--coffee-medium);">Total Collections</h3>
+        <div class="stat-number">{{ total_collections }}</div>
+        <small>This month</small>
+    </div>
+    
+    <div class="stat-card">
+        <div class="coffee-icon">⚖️</div>
+        <h3 style="margin: 0; color: var(--coffee-medium);">Total Weight</h3>
+        <div class="stat-number">{{ total_weight }} kg</div>
+        <small>Collected coffee</small>
+    </div>
+    
+    <div class="stat-card">
+        <div class="coffee-icon">👨‍🌾</div>
+        <h3 style="margin: 0; color: var(--coffee-medium);">Farmers</h3>
+        <div class="stat-number">{{ farmers_count }}</div>
+        <small>Registered farmers</small>
+    </div>
+    
+    <div class="stat-card">
+        <div class="coffee-icon">💰</div>
+        <h3 style="margin: 0; color: var(--coffee-medium);">Pending</h3>
+        <div class="stat-number">{{ pending_payments }}</div>
+        <small>Payments pending</small>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+    <div class="card">
+        <h2 style="color: var(--coffee-dark); margin-top: 0;">
+            Recent Collections
+        </h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: var(--cream);">
+                    <th style="padding: 12px; text-align: left;">Farmer</th>
+                    <th style="padding: 12px; text-align: left;">Weight (kg)</th>
+                    <th style="padding: 12px; text-align: left;">Grade</th>
+                    <th style="padding: 12px; text-align: left;">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for collection in recent_collections %}
+                <tr style="border-bottom: 1px solid var(--coffee-light);">
+                    <td style="padding: 12px;">{{ collection.farmer }}</td>
+                    <td style="padding: 12px;">{{ collection.weight }}</td>
+                    <td style="padding: 12px;">
+                        <span style="background: var(--cream); padding: 4px 8px; border-radius: 4px;">
+                            {{ collection.grade }}
+                        </span>
+                    </td>
+                    <td style="padding: 12px;">{{ collection.date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="card">
+        <h2 style="color: var(--coffee-dark); margin-top: 0;">
+            Quick Actions
+        </h2>
+        <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+            <a href="#" class="btn btn-primary">
+                ➕ Record New Collection
+            </a>
+            <a href="#" class="btn">
+                👨‍🌾 Register Farmer
+            </a>
+            <a href="#" class="btn">
+                💰 Process Payment
+            </a>
+            <a href="#" class="btn">
+                📊 View Reports
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
