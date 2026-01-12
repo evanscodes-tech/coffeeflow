@@ -1,5 +1,9 @@
+from decouple import config 
+import os 
 import os 
 import os
+import os
+from decouple import config
 import os
 
 #from decouple import config#
